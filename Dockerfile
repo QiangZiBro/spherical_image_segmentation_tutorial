@@ -10,4 +10,3 @@ RUN export http_proxy="" &&  export https_proxy="" && apt-get update && apt-get 
 ADD . /workspace
 WORKDIR /workspace
 RUN pip install -r requirements.txt
-RUN cp -r .jupyter/ ~
