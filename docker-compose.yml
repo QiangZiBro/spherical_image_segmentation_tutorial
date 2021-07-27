@@ -1,0 +1,34 @@
+version: "3.0"
+services:
+  spherical-env:
+    image: spherical
+    build:
+        context: ./
+        dockerfile: Dockerfile
+    volumes:
+        - .:/workspace
+    tty: true
+    network_mode: "host"
+    environment:
+      - "http_proxy=${http_proxy}"
+      - "https_proxy=${https_proxy}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - capabilities: [gpu]
+
+  jupyterlab:
+    image: spherical
+    build:
+        context: ./
+        dockerfile: Dockerfile
+
+    network_mode: "host"
+    environment:
+      - "http_proxy=${http_proxy}"
+      - "https_proxy=${https_proxy}"
+
+    volumes:
+        - .:/workspace
+    entrypoint: sh -c 'jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/workspace --allow-root'
