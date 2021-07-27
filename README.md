@@ -214,10 +214,7 @@ class SphericalUNet(nn.Module):
 
 训练200个epoch后，可得如下结果：
 
-```bash
-```
-
-
+![image-20210727204519252](imgs/README/image-20210727204519252.png)
 
 ## 测试
 
