@@ -1,6 +1,7 @@
 import math
 import argparse
 import sys
+sys.path.append("../../meshcnn")
 import numpy as np; np.set_printoptions(precision=4)
 import pickle, gzip
 import os
@@ -55,8 +56,8 @@ def iou_score(pred_cls, true_cls, nclass=15, drop=drop):
     union_ = []
     for i in range(nclass):
         if i not in drop:
-            intersect = ((pred_cls == i) + (true_cls == i)).eq(2).sum().item()
-            union = ((pred_cls == i) + (true_cls == i)).ge(1).sum().item()
+            intersect = ((pred_cls == i).int() + (true_cls == i).int()).eq(2).sum().item()
+            union = ((pred_cls == i).int() + (true_cls == i).int()).ge(1).sum().item()
             intersect_.append(intersect)
             union_.append(union)
     return np.array(intersect_), np.array(union_)
@@ -67,7 +68,7 @@ def accuracy(pred_cls, true_cls, nclass=15, drop=drop):
     tpos = []
     for i in range(nclass):
         if i not in drop:
-            true_positive = ((pred_cls == i) + (true_cls == i)).eq(2).sum().item()
+            true_positive = ((pred_cls == i).int() + (true_cls == i).int()).eq(2).sum().item()
             tpos.append(true_positive)
             per_cls_counts.append(positive[i])
     return np.array(tpos), np.array(per_cls_counts)
@@ -151,8 +152,8 @@ def main():
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--mesh_folder', type=str, default="data/mesh_files",
-                        help='path to mesh folder (default: data/mesh_files)')
+    parser.add_argument('--mesh_folder', type=str, default="../../mesh_files",
+                        help='path to mesh folder (default: ../../mesh_files)')
     parser.add_argument('--data_folder', type=str, default="processed_data",
                         help='path to data folder (default: processed_data)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',

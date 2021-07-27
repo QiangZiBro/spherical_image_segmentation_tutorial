@@ -1,6 +1,7 @@
 #!/bin/bash
 MESHFILES=data/mesh_files
 DATADIR=data/2d3ds_sphere
+#DATADIR=data/2d3ds_pano_small
 # create log directory
 mkdir -p logs
 
