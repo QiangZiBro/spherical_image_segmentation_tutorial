@@ -18,7 +18,7 @@
 
 本教程以及相关代码在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
 
-## 环境搭建
+## 环境构建
 
 ### 实验环境
 
@@ -89,11 +89,9 @@ make up # 启动由镜像定义的服务
 make env # 进入到容器终端
 ```
 
-## 全景数据集
+## 数据获取
 
 使用2D-3D-S 数据集进行本实验，该数据集提供了来自 2D、2.5D 和 3D 域的各种相互注册的数据，以及实例级语义和几何注释。 它收集在来自 3 座不同建筑的 6 个大型室内区域。 它包含超过 70,000 张 RGB 图像，以及相应的深度、表面法线、语义注释、全局 XYZ 图像（均以常规和 360° 等距柱状图图像的形式）以及相机信息。 它还包括注册的原始和语义注释 3D 网格和点云。
-
-### 数据获取
 
 使用国内数据集网站：https://gas.graviti.cn/，这个网站汇总了AI开发者常见的公开数据集，更方便的是，我们能通过命令上传、下载数据集。对于发布在网站上的数据集，fork后还可以通过命令行进行下载。
 
@@ -123,19 +121,9 @@ gas auth [ACCESSKEY]
 
 将下载后的数据放在`data`文件夹下。
 
-## 实践
-
-在使用`make env`成功进入到容器终端后，运行`run.sh`启动训练
-
-```bash
-./run.sh
-```
-
-### 方法介绍
+## 模型构建
 
 参考论文《Spherical CNNs on Unstructured Grids》的方法UGSCNN[3]
-
-<img src="imgs/README/image-20210727184927162.png" alt="image-20210727184927162" style="zoom:50%;" />
 
 MeshConv对卷积算子进行定义：
 
@@ -176,6 +164,8 @@ class MeshConv(_MeshConv):
 
 分割网络的定义
 
+<img src="imgs/README/image-20210727184927162.png" alt="image-20210727184927162" style="zoom:50%;" />
+
 ```python
 class SphericalUNet(nn.Module):
     def __init__(self, mesh_folder, in_ch, out_ch, max_level=5, min_level=0, fdim=16):
@@ -213,6 +203,23 @@ class SphericalUNet(nn.Module):
     def __meshfile(self, i):
         return os.path.join(self.mesh_folder, "icosphere_{}.pkl".format(i))
 ```
+
+## 训练
+
+在使用`make env`成功进入到容器终端后，运行`run.sh`启动训练
+
+```bash
+./run.sh
+```
+
+训练200个epoch后，可得如下结果：
+
+```bash
+```
+
+
+
+## 测试
 
 
 
