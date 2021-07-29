@@ -1,6 +1,5 @@
 up:
 	docker-compose up -d
-	make env
 
 down:
 	docker-compose down
