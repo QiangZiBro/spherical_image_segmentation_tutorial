@@ -3,3 +3,4 @@ jupyterlab
 scikit-learn
 pandas
 matplotlib
+ipython>=7.20
