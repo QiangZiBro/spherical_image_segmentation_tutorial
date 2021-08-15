@@ -104,7 +104,7 @@ in:
 
 ```bash
 docker pull qiangzibro/spherical_image_segmentation
-#或者下面命令自己编译
+# 或者使用下面命令自己编译
 make build
 ```
 
@@ -120,7 +120,9 @@ make up #等价于 docker-compose up -d
 make in
 ```
 
-使用`docker-compose logs`还可以看到notebook对应的网址。
+使用`docker-compose logs`可以看到notebook对应的网址
+
+![env](imgs/README/env.gif)
 
 ## 数据获取
 
