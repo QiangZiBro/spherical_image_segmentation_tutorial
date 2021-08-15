@@ -20,9 +20,44 @@
 
 本教程以及相关代码在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
 
+```bash
+git clone https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
+cd spherical_image_segmentation_tutorial
+```
+
 ## 环境构建
 
-### 实验环境
+基于深度学习的编程环境往往有各种复杂的环境依赖，而各种安装报错总是消磨我们的时间，其实之一过程可以大大缩短。我们所需要的也就是通过一个命令安装所有的依赖并打开环境
+
+```bash
+make up #等价于 docker-compose up -d
+```
+
+再通过一个命令
+
+```bash
+make in
+```
+
+来进入我们需要的环境，然后运行程序。为实现构建这一过程，基于`docker` –`docker-compose` – `make`来搭建我们的环境，其原理如下图所示：
+
+<img src="imgs/README/image-20210815194243532.png" alt="环境构建原理图" style="zoom: 67%;" />
+
+`docker` –`docker-compose` – `make`三个工具对应三个配置文件，都在项目根目录进行了声明：
+
+```txt
+Dockerfile
+docker-compose.yml
+Makefile
+```
+
+其中
+
+- `Dockerfile` 定义了实验所需要的所有环境，依据此文件可以编译成docker镜像，其中包含我们需要的库
+- `docker-compose.yml`定义了镜像的启动方式，在本文中，我们定义两个服务，一个作为终端来运行命令，一个作为`jupyter lab`供调试
+- `Makefile`定义了启动环境的方式
+
+本文实验环境
 
 - Ubuntu20.04
 - CUDA11.0
@@ -31,41 +66,28 @@
 ### Docker安装
 
 ```bash
-# 安装docker
+# 1.安装docker
 sudo apt install -y docker docker.io
-# 安装英伟达docker
+# 2.安装英伟达docker
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
 && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
 && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
 sudo apt-get update
 sudo apt-get install -y nvidia-docker2
-# 安装docker-compose
+# 3.安装docker-compose(apt常常不能安装最新版本的docker-compose)
 pip install docker-compose
-
-# 最后
+# 4.解决linux下docker的权限问题，将用户放在docker组里
+GROUPNAME=docker
+getent group $GROUPNAME 2>&1 >/dev/null || groupadd $GROUPNAME
+sudo usermod -aG docker $(whoami)
+# 5.重启
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
-考虑到环境构建和移植的方便，使用docker进行构建
-
-```bash
-git clone https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
-cd spherical_image_segmentation_tutorial
-docker build -t spherical .
-```
-
-如果docker镜像构建过程出现了网络问题，可以参考文章[2]
-
-```bash
-docker load < spherical.tar
-```
-
-即可使用！
-
 ### 使用Docker镜像
 
-Docker镜像构建好之后，我们可以直接运行docker命令，启动镜像，但是这样不是最方便的。这里推荐`docker-compose`搭配`Makefile`，具体操作如下：首先写好`docker-compose.yml`启动文件，可参考本文对应的[docker-compose.yml](https://github.com/QiangZiBro/spherical_image_segmentation_tutorial/blob/main/docker-compose.yml)，接着，在Makefile里写常见docker相关命令，我们将应用分为编译（build）、启动（up）、关闭（down）、进入容器环境（env）四个需求，Makefile如下：
+Docker镜像构建好之后，可以直接运行docker命令启动镜像，但是这样不是最方便的。使用`docker-compose`搭配`Makefile`，具体操作如下：首先写好`docker-compose.yml`启动文件，可参考本项目对应的[docker-compose.yml](https://github.com/QiangZiBro/spherical_image_segmentation_tutorial/blob/main/docker-compose.yml)，接着，在Makefile里写常见docker相关命令，我们将应用分为启动（up）、关闭（down）、进入容器环境（in）三个需求，Makefile如下：
 
 ```makefile
 up:
@@ -74,22 +96,33 @@ up:
 down:
 	docker-compose down
 
-env:
+in:
 	docker-compose exec spherical-env bash
-
-build:
-	docker build -t spherical . --network host \
-			--build-arg http_proxy=${http_proxy}\
-			--build-arg https_proxy=${https_proxy}
 ```
 
-因此，本项目的开始，只需要3个命令：
+本项目镜像已上传dockerhub，可以直接使用下列命令下载
 
 ```bash
-make buid # 根据Dockerfile编译镜像
-make up # 启动由镜像定义的服务
-make env # 进入到容器终端
+docker pull qiangzibro/spherical_image_segmentation
+# 或者使用下面命令自己编译
+make build
 ```
+
+接着，一键完成编译、启动
+
+```bash
+make up #等价于 docker-compose up -d
+```
+
+再通过下列命令便可以进入终端
+
+```bash
+make in
+```
+
+使用`docker-compose logs`可以看到notebook对应的网址
+
+![env](imgs/README/env.gif)
 
 ## 数据获取
 
@@ -208,7 +241,7 @@ class SphericalUNet(nn.Module):
 
 ## 训练
 
-在使用`make env`成功进入到容器终端后，运行`run.sh`启动训练
+在使用`make in`成功进入到容器终端后，运行`run.sh`启动训练
 
 ```bash
 ./run.sh
