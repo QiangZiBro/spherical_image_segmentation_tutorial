@@ -4,7 +4,7 @@ up:
 down:
 	docker-compose down
 
-env:
+in:
 	docker-compose exec spherical-env bash
 
 build:
