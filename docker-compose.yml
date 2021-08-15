@@ -24,14 +24,16 @@ services:
         context: ./
         dockerfile: Dockerfile
 
-    network_mode: "host"
+    ports:
+        - 11000:8888
     environment:
       - "http_proxy=${http_proxy}"
       - "https_proxy=${https_proxy}"
+      - "PASSWORD="
 
     volumes:
         - .:/workspace
-    entrypoint: sh -c 'jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/workspace --allow-root'
+    entrypoint: sh -c "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/workspace --allow-root --NotebookApp.token='spherical' --NotebookApp.password='spherical'"
     deploy:
       resources:
         reservations:
