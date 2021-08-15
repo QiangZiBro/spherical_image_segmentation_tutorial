@@ -3,3 +3,4 @@ imgs
 data
 docker-compose.yml
 Dockerfile
+Makefile
