@@ -31,4 +31,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: qiangzibro/spherical:latest
+          tags: qiangzibro/spherical_image_segmentation:latest
