@@ -5,3 +5,4 @@ pandas
 matplotlib
 ipython>=7.20
 imageio
+scikit-image
