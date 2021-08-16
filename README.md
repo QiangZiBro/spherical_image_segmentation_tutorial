@@ -2,23 +2,15 @@
 
 [TOC]
 
-> 作者介绍：张强（QiangZiBro），Datawhale成员，宁波大学研究生，研究方向为矢量型神经网络和三维视觉。
+> 作者介绍：张强（QiangZiBro），Datawhale成员。
 
 ## 导读
 
-本文手把手带你完成一个有趣的应用——全景图像语义分割。相信许多读者体验过b站上的全景视频，如果还没有，快来体验一下吧[1]！只需鼠标点击并移动，便可360度无死角的浏览全景视频。现在，随着insta360，go pro等相机发展趋于成熟，全景图像数据的获取唾手可得。和普通相机拍摄得到的数据不同，全景图像数据分布在球面上，如下图所示，如果将全景图像展开则会造成畸变，因此，直接将传统二维平面图像处理方法应用到球面数据上，其效果则会大大降低。
+相信许多读者体验过b站上的全景视频，如果还没有，快来体验一下吧[1]！只需鼠标点击并移动，便可360度无死角的浏览全景视频。全景图像，又称360°全景图，其数据分布在球面空间上。如下图所示，如果将全景图像展开则会造成畸变，因此，直接将传统二维平面图像处理方法应用到球面数据上，其效果则会大大降低。而要解决分布在球面空间上的数据，需要特定的方法，比如球面卷积网络。本文手把手带你实践一个有趣的应用——全景图像语义分割，使用多种传统CNN方法和球面CNN方法进行对比。
 
 <img src="imgs/动手实现球面图片分割/image-20210723214830537.png" alt="image-20210723214830537" style="zoom: 33%;" />
 
-而要解决分布在球面空间上的数据，需要特定的方法，比如球面卷积网络。本文从以下几个方面展开
-
-- 环境构建
-- 数据获取
-- 模型构建
-- 训练
-- 测试
-
-本教程以及相关代码在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
+本教程以及相关代码托管在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
 
 ```bash
 git clone https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
@@ -41,7 +33,7 @@ make in
 
 来进入我们需要的环境，然后运行程序。为实现构建这一过程，基于`docker` –`docker-compose` – `make`来搭建我们的环境，其原理如下图所示：
 
-<img src="imgs/README/image-20210815194243532.png" alt="环境构建原理图" style="zoom: 67%;" />
+<img src="imgs/README/image-20210815194243532.png" alt="环境构建原理图" style="zoom: 33%;" />
 
 `docker` –`docker-compose` – `make`三个工具对应三个配置文件，都在项目根目录进行了声明：
 
@@ -122,8 +114,6 @@ make in
 
 使用`docker-compose logs`可以看到notebook对应的网址
 
-![env](imgs/README/env.gif)
-
 ## 数据获取
 
 使用2D-3D-S 数据集进行本实验，该数据集提供了来自 2D、2.5D 和 3D 域的各种相互注册的数据，以及实例级语义和几何注释。 它收集在来自 3 座不同建筑的 6 个大型室内区域。 它包含超过 70,000 张 RGB 图像，以及相应的深度、表面法线、语义注释、全局 XYZ 图像（均以常规和 360° 等距柱状图图像的形式）以及相机信息。 它还包括注册的原始和语义注释 3D 网格和点云。
@@ -156,7 +146,68 @@ gas auth [ACCESSKEY]
 
 将下载后的数据放在`data`文件夹下。
 
-## 模型构建
+
+
+## 训练
+
+在使用`make in`成功进入到容器终端
+
+- 基于CNN对网格进行分割
+
+```bash
+cd cnns
+# 基于
+./run.sh UNet
+# 基于FCN
+./run.sh FCN8s
+# 基于ResNetDUCHDC
+./run.sh ResNetDUCHDC
+```
+
+脚本`run.sh`解释
+
+```bash
+# Model choice
+# ResNetDUCHDC,FCN8s,UNet
+# Run example
+# 1) ./run.sh
+# 2) ./run.sh FCN8s
+# 3) ./run.sh ResNetDUCHDC
+model="${1:-UNet}"
+MESHFILES=../data/mesh_files
+DATADIR=../data/2d3ds_pano_small/
+# create log directory
+mkdir -p logs
+
+python train.py \
+--batch-size 16 \ # 训练批量大小
+--test-batch-size 16 \ #测试批量大小
+--epochs 200 \ # 训练epoch数量
+--data_folder $DATADIR \
+--mesh_folder $MESHFILES \ # 正二十面体网格文件位置
+--fold 3 \ # K-fold交叉验证，k=3。将原始数据分成K组(K-Fold)，将每个子集数据分别做一次验证集，其余的K-1组子集数据作为训练集，这样会得到K个模型。这K个模型分别在验证集中评估结果，最后的误差MSE(Mean Squared Error)加和平均就得到交叉验证误差。交叉验证有效利用了有限的数据，并且评估结果能够尽可能接近模型在测试集上的表现，可以做为模型优化的指标使用。
+--log_dir logs/log_${model}_f16_cv3_rgbd \ # 日志目录
+--decay \ # 学习率衰减
+--train_stats_freq 5 \
+--model ${model} \ #模型选择
+--in_ch rgbd \ # 输入数据通道
+--lr 1e-3 \ # 学习路
+--feat 16 #特征层的数量
+
+```
+
+- 基于UGSCNN对球面数据进行分割
+
+```bash
+cd ugscnn
+./run.sh
+```
+
+训练200个epoch后，可得如下结果：
+
+![image-20210727204519252](imgs/README/image-20210727204519252.png)
+
+## 方法
 
 参考论文《Spherical CNNs on Unstructured Grids》的方法UGSCNN[3]
 
@@ -239,21 +290,9 @@ class SphericalUNet(nn.Module):
         return os.path.join(self.mesh_folder, "icosphere_{}.pkl".format(i))
 ```
 
-## 训练
-
-在使用`make in`成功进入到容器终端后，运行`run.sh`启动训练
-
-```bash
-./run.sh
-```
-
-训练200个epoch后，可得如下结果：
-
-![image-20210727204519252](imgs/README/image-20210727204519252.png)
-
 ## 总结
 
-本文动手实现了全景图语义分割任务，使用docker作为环境构建，使用一种全景分割方法在全景数据集上完成了分割任务。
+本文介绍了docker作为环境构建的知识，介绍几种基于传统CNN方法和一种基于球面CNN的方法，并将上述方法在全景数据集上完成了分割任务。
 
 ## 参考资料
 
