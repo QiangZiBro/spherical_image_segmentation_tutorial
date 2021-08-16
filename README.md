@@ -128,7 +128,7 @@ make in
 
 ![image-20210727182550717](imgs/README/image-20210727182550717.png)
 
-为方便后续使用，笔者选择使用命令来上传、下载数据集，点击开发者工具，获取一个AccessKey，并拷贝这个AccessKey
+如果需要上传数据集，可以使用命令行结构。点击开发者工具，获取一个AccessKey，并拷贝这个AccessKey
 
 <img src="imgs/README/image-20210727182935054.png" alt="image-20210727182935054" style="zoom:50%;" />
 
@@ -140,7 +140,7 @@ pip3 install tensorbay
 gas auth [ACCESSKEY]
 ```
 
-将数据下载完成后，放在项目的`data`文件夹下，搜索`spherical_segmentation`点击进入
+搜索`spherical_segmentation`点击进入
 
 <img src="imgs/README/image-20210727191420120.png" alt="image-20210727191420120" style="zoom:50%;" />
 
@@ -252,47 +252,9 @@ class MeshConv(_MeshConv):
         return out
 ```
 
-分割网络的定义
+分割网络基于MeshConv算子构建了一个Unet网络：
 
 <img src="imgs/README/image-20210727184927162.png" alt="image-20210727184927162" style="zoom:50%;" />
-
-```python
-class SphericalUNet(nn.Module):
-    def __init__(self, mesh_folder, in_ch, out_ch, max_level=5, min_level=0, fdim=16):
-        super().__init__()
-        self.mesh_folder = mesh_folder
-        self.fdim = fdim
-        self.max_level = max_level
-        self.min_level = min_level
-        self.levels = max_level - min_level
-        self.down = []
-        self.up = []
-        self.in_conv = MeshConv(in_ch, fdim, self.__meshfile(max_level), stride=1)
-        self.out_conv = MeshConv(fdim, out_ch, self.__meshfile(max_level), stride=1)
-        # Downward path
-        for i in range(self.levels-1):
-            self.down.append(Down(fdim*(2**i), fdim*(2**(i+1)), max_level-i-1, mesh_folder))
-        self.down.append(Down(fdim*(2**(self.levels-1)), fdim*(2**(self.levels-1)), min_level, mesh_folder))
-        # Upward path
-        for i in range(self.levels-1):
-            self.up.append(Up(fdim*(2**(self.levels-i)), fdim*(2**(self.levels-i-2)), min_level+i+1, mesh_folder))
-        self.up.append(Up(fdim*2, fdim, max_level, mesh_folder))
-        self.down = nn.ModuleList(self.down)
-        self.up = nn.ModuleList(self.up)
-
-    def forward(self, x):
-        x_ = [self.in_conv(x)]
-        for i in range(self.levels):
-            x_.append(self.down[i](x_[-1]))
-        x = self.up[0](x_[-1], x_[-2])
-        for i in range(self.levels-1):
-            x = self.up[i+1](x, x_[-3-i])
-        x = self.out_conv(x)
-        return x
-
-    def __meshfile(self, i):
-        return os.path.join(self.mesh_folder, "icosphere_{}.pkl".format(i))
-```
 
 ## 测试
 
