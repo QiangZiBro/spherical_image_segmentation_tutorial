@@ -1,7 +1,6 @@
 import math
 import argparse
 import sys
-sys.path.append("../../meshcnn")
 import numpy as np
 import pickle, gzip
 import os
@@ -10,7 +9,7 @@ import shutil
 
 from ops import MeshConv
 from loader import S2D3DSegLoader
-from model import UNet
+from model import SphericalUNet
 
 import torch
 import torch.nn.functional as F
@@ -140,10 +139,10 @@ def main():
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--mesh_folder', type=str, default="../../mesh_files",
-                        help='path to mesh folder (default: ../../mesh_files)')
-    parser.add_argument('--ckpt', type=str, default="log/log_f32_cv1_l5_lw/checkpoint_latest.pth.tar_UNet_best.pth.tar")
-    parser.add_argument('--data_folder', type=str, default="data",
+    parser.add_argument('--mesh_folder', type=str, default="data/mesh_files",
+                        help='path to mesh folder (default: data/mesh_files)')
+    parser.add_argument('--ckpt', type=str, default="logs/log_f16_cv3/checkpoint_latest.pth.tar_SUNet_best.pth.tar")
+    parser.add_argument('--data_folder', type=str, default="data/2d3ds_sphere",
                         help='path to data folder (default: processed_data)')
     parser.add_argument('--max_level', type=int, default=5, help='max mesh level')
     parser.add_argument('--min_level', type=int, default=0, help='min mesh level')
@@ -160,7 +159,7 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    model = UNet(mesh_folder=args.mesh_folder, in_ch=len(args.in_ch), out_ch=len(classes), 
+    model = SphericalUNet(mesh_folder=args.mesh_folder, in_ch=len(args.in_ch), out_ch=len(classes), 
         max_level=args.max_level, min_level=args.min_level, fdim=args.feat)
     model = nn.DataParallel(model)
     model.to(device)

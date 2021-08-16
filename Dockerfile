@@ -7,6 +7,6 @@ FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 RUN export http_proxy="" &&  export https_proxy="" && apt-get update && apt-get install -y curl ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-ADD . /workspace
 WORKDIR /workspace
+COPY requirements.txt .
 RUN pip install -r requirements.txt
