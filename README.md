@@ -10,6 +10,10 @@
 
 <img src="imgs/动手实现球面图片分割/image-20210723214830537.png" alt="image-20210723214830537" style="zoom: 33%;" />
 
+如下图所示，全景图分割实例像素级别分类，每种实例对应一个标签。完成本教程后，你将能够做一个如下图所示的全景图小应用。
+
+<img src="imgs/README/image-20210816192833332.png" alt="image-20210816192833332" style="zoom:50%;" />
+
 本教程以及相关代码托管在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
 
 ```bash
@@ -289,6 +293,33 @@ class SphericalUNet(nn.Module):
     def __meshfile(self, i):
         return os.path.join(self.mesh_folder, "icosphere_{}.pkl".format(i))
 ```
+
+## 测试
+
+使用提供的测试脚本`test.sh`即可进行测试
+
+```bash
+# 基于UNet
+./test.sh UNet
+# 基于FCN
+./test.sh FCN8s
+# 基于ResNetDUCHDC
+./test.sh ResNetDUCHDC
+```
+
+测试结果保存在当前目录下，命名格式为`模型名`+`.npz`，将其打开进行结果分析：
+
+全景图实例
+
+<img src="imgs/README/image-20210816180457180.png" alt="image-20210816180457180" style="zoom:33%;" />
+
+
+
+结果
+
+![image-20210816190643319](imgs/README/image-20210816190643319.png)
+
+更多结果欢迎打开[spherical_image_segmentation.ipynb](https://github.com/QiangZiBro/spherical_image_segmentation_tutorial/blob/main/spherical_image_segmentation.ipynb) 来动手体验吧！
 
 ## 总结
 
