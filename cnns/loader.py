@@ -3,7 +3,7 @@ from glob import glob
 import os
 import random
 from torch.utils.data import Dataset
-from scipy.misc import imread
+from imageio import imread
 
 # precomputed mean and std of the dataset
 precomp_mean = [0.4974898, 0.47918808, 0.42809588, 1.0961773]
@@ -60,7 +60,7 @@ class SemSegLoader(Dataset):
 
     def __getitem__(self, idx):
         # load files
-        rgb = imread(self.rgb_list[idx], mode='RGB')/255.
+        rgb = imread(self.rgb_list[idx], pilmode='RGB')/255.
         d = np.expand_dims(np.clip(imread(self.d_list[idx])/1000, 0, 5), -1)
         out_semantic = imread(self.labels_list[idx])
         out_feature_instance_id = out_semantic[..., 1].astype('uint32') * 256 + out_semantic[...,2].astype('uint32')

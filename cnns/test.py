@@ -171,6 +171,10 @@ def main():
         model = FCN8s(len(classes), pretrained=False, feat=args.feat, in_ch=len(args.in_ch))
     elif args.model == "UNet":
         model = UNet(len(classes), len(args.in_ch), feat=args.feat)
+    elif args.model == "ResNetDUCHDC":
+        model = ResNetDUCHDC(len(classes), pretrained=False, in_ch=len(args.in_ch))
+    else:
+        raise Exception("No such model")
     model = nn.DataParallel(model)
     model.to(device)
 
