@@ -152,8 +152,8 @@ def main():
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--mesh_folder', type=str, default="../../mesh_files",
-                        help='path to mesh folder (default: ../../mesh_files)')
+    parser.add_argument('--mesh_folder', type=str, default="data/mesh_files",
+                        help='path to mesh folder (default: data/mesh_files)')
     parser.add_argument('--data_folder', type=str, default="processed_data",
                         help='path to data folder (default: processed_data)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
