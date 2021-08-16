@@ -4,4 +4,4 @@ scikit-learn
 pandas
 matplotlib
 ipython>=7.20
-scipy==1.2.0
+imageio
