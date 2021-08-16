@@ -154,6 +154,10 @@ gas auth [ACCESSKEY]
 
 ## 训练
 
+环境构建好只够只需简单的几个命令便可以运行起来
+
+![env](imgs/README/env-9114978.gif)
+
 在使用`make in`成功进入到容器终端
 
 - 基于CNN对网格进行分割
