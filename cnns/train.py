@@ -199,8 +199,8 @@ def main():
     if not os.path.exists(args.log_dir):
         os.makedirs(args.log_dir)
 
-    trainset = SemSegLoader(args.data_folder, "train", fold=args.fold, in_ch=len(args.in_ch))
-    valset = SemSegLoader(args.data_folder, "test", fold=args.fold, in_ch=len(args.in_ch))
+    trainset = SemSegLoader("train", fold=args.fold, in_ch=len(args.in_ch))
+    valset = SemSegLoader("test", fold=args.fold, in_ch=len(args.in_ch))
     train_loader = DataLoader(trainset, batch_size=args.batch_size, shuffle=True, drop_last=True)
     val_loader = DataLoader(valset, batch_size=args.batch_size, shuffle=True, drop_last=False)
 
