@@ -14,7 +14,7 @@
 
 <img src="imgs/README/image-20210816192833332.png" alt="image-20210816192833332" style="zoom:50%;" />
 
-本教程以及相关代码托管在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
+本教程以及相关代码托管在https://github.com/QiangZiBro/spherical_image_segmentation_tutorial，欢迎讨论、提Issue
 
 ```bash
 git clone https://github.com/QiangZiBro/spherical_image_segmentation_tutorial
@@ -134,7 +134,13 @@ c. fork数据集
 
 ![image-20210915170228705](imgs/README/image-20210915170228705.png)
 
-d. 点击网页上方开发者工具，获取使用SDK所需的AccessKey，写入AccessKey。通过AccessKey可以上传数据、读取数据、使用数据，灵活对接模型开发和训练，与数据pipeline快速集成
+d. 点击网页上方开发者工具，获取使用SDK所需的AccessKey，获取到 AccessKey 后，将其存在项目根目录的`gas_key.py`里：
+
+```python
+KEY = "<Your-Key>"
+```
+
+然后即可以通过AccessKey可以上传数据、读取数据、使用数据，灵活对接模型开发和训练，与数据pipeline快速集成。
 
 e. AccessKey写入后就可以写代码读取数据了，读完了一行下载代码就可以进行下载。将下载后的数据放在`data`文件夹下。
 
