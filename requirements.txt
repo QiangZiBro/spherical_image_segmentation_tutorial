@@ -7,4 +7,4 @@ ipython>=7.20
 imageio
 scikit-image
 tensorbay
-numpy=1.21.2
+numpy==1.21.2
