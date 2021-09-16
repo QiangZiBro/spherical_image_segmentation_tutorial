@@ -1,19 +1,42 @@
+import sys
+sys.path.append("..")
 import numpy as np
 from glob import glob
 import os
 import random
-from torch.utils.data import Dataset, DataLoader
+import io
 
-# sphere mesh size at different levels
+from torch.utils.data import Dataset, DataLoader
+from PIL import Image
+from gas_key import KEY
+from tensorbay import GAS
+from tensorbay.dataset import Segment
+
+gas = GAS(KEY)
+dataset_client = gas.get_dataset("SphericalSegmentation")
+segments = dataset_client.list_segment_names()
+file_format = Segment("2d3ds_sphere", dataset_client)
+
 nv_sphere = [12, 42, 162, 642, 2562, 10242, 40962, 163842]
-# precomputed mean and std of the dataset
 precomp_mean = [0.4974898, 0.47918808, 0.42809588, 1.0961773]
 precomp_std = [0.23762763, 0.23354423, 0.23272438, 0.75536704]
 
+def getter(a, seg):
+    # 获取对应区域a的所有数据
+    result = []
+    for i in seg:
+        if f"area_{a}" in i.path:
+            result.append(i)
+    return sorted(result, key=lambda x:x.path)
+
+def read_gas(data):
+    with data.open() as f:
+        return np.load(io.BytesIO(f.read()), allow_pickle=True)
+    
 class S2D3DSegLoader(Dataset):
     """Data loader for 2D3DS dataset."""
 
-    def __init__(self, data_dir, partition, fold, sp_level, in_ch=4, normalize_mean=precomp_mean, normalize_std=precomp_std):
+    def __init__(self, partition, fold, sp_level, in_ch=4, normalize_mean=precomp_mean, normalize_std=precomp_std):
         """
         Args:
             data_dir: path to data directory
@@ -44,9 +67,7 @@ class S2D3DSegLoader(Dataset):
 
         self.flist = []
         for a in self.areas:
-            area_dir = os.path.join(data_dir, "area_" + a)
-            file_format = os.path.join(area_dir, "*.npz")
-            self.flist += sorted(glob(file_format))
+            self.flist += getter(a, file_format)
 
         self.mean = np.expand_dims(precomp_mean, -1).astype(np.float32)
         self.std = np.expand_dims(precomp_std, -1).astype(np.float32)
@@ -55,8 +76,7 @@ class S2D3DSegLoader(Dataset):
         return len(self.flist)
 
     def __getitem__(self, idx):
-        # load files
         fname = self.flist[idx]
-        data = (np.load(fname)["data"].T[:self.in_ch, :self.nv] - self.mean) / self.std
-        labels = np.load(fname)["labels"].T[:self.nv].astype(np.int)
+        data = (read_gas(fname)["data"].T[:self.in_ch, :self.nv] - self.mean) / self.std
+        labels = read_gas(fname)["labels"].T[:self.nv].astype(np.int)
         return data, labels

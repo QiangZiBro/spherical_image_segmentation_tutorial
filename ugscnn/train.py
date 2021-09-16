@@ -197,8 +197,8 @@ def main():
     if not os.path.exists(args.log_dir):
         os.makedirs(args.log_dir)
 
-    trainset = S2D3DSegLoader(args.data_folder, "train", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
-    valset = S2D3DSegLoader(args.data_folder, "test", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
+    trainset = S2D3DSegLoader( "train", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
+    valset = S2D3DSegLoader("test", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
     train_loader = DataLoader(trainset, batch_size=args.batch_size, shuffle=True, drop_last=True)
     val_loader = DataLoader(valset, batch_size=args.batch_size, shuffle=True, drop_last=False)
     

@@ -188,7 +188,7 @@ def main():
     load_my_state_dict(model, resume_dict['state_dict'])  
     print("=> loaded checkpoint '{}' (epoch {} loss {:.03f}) "
           .format(args.ckpt, resume_dict['epoch'], best_miou))
-    testset = S2D3DSegLoader(args.data_folder, "test", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
+    testset = S2D3DSegLoader("test", fold=args.fold, sp_level=args.max_level, in_ch=len(args.in_ch))
     test_loader = DataLoader(testset, batch_size=args.test_batch_size, shuffle=True)
 
     if args.export_file:
