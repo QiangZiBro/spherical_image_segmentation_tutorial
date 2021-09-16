@@ -250,6 +250,7 @@ python train.py \
 - 基于UGSCNN对球面数据进行分割
 
 ```bash
+python gen_mesh.py
 cd ugscnn
 ./run.sh
 ```
