@@ -19,7 +19,7 @@ services:
           - capabilities: [gpu]
 
   jupyterlab:
-    image: spherical
+    image: qiangzibro/spherical_image_segmentation:latest
     build:
         context: ./
         dockerfile: Dockerfile
