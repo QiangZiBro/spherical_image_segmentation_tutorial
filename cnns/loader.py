@@ -13,7 +13,7 @@ from gas_key import KEY
 gas = GAS(KEY)
 
 # Get a dataset client.
-dataset_client = gas.get_dataset("SphericalSegmentation")
+dataset_client = gas.get_dataset("spherical_segmentation")
 
 # List dataset segments.
 segments = dataset_client.list_segment_names()

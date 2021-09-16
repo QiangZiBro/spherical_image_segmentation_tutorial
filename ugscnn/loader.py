@@ -13,7 +13,7 @@ from tensorbay import GAS
 from tensorbay.dataset import Segment
 
 gas = GAS(KEY)
-dataset_client = gas.get_dataset("SphericalSegmentation")
+dataset_client = gas.get_dataset("spherical_segmentation")
 segments = dataset_client.list_segment_names()
 file_format = Segment("2d3ds_sphere", dataset_client)
 
